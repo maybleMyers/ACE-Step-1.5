@@ -11,27 +11,27 @@ from acestep.gradio_ui.i18n import t
 
 def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
     """Create the training tab section with dataset builder and training controls.
-    
+
     Args:
         dit_handler: DiT handler instance
         llm_handler: LLM handler instance
         init_params: Dictionary containing initialization parameters and state.
                     If None, service will not be pre-initialized.
-        
+
     Returns:
         Dictionary of Gradio components for event handling
     """
     # Check if running in service mode (hide training tab)
     service_mode = init_params is not None and init_params.get('service_mode', False)
-    
-    with gr.Tab(t("training.tab_title"), visible=not service_mode):
+
+    with gr.Column(visible=not service_mode):
         gr.HTML("""
         <div style="text-align: center; padding: 10px; margin-bottom: 15px;">
             <h2>🎵 LoRA Training for ACE-Step</h2>
             <p>Build datasets from your audio files and train custom LoRA adapters</p>
         </div>
         """)
-        
+
         with gr.Tabs():
             # ==================== Dataset Builder Tab ====================
             with gr.Tab(t("training.tab_dataset_builder")):
@@ -42,7 +42,7 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                     <p style="margin: 0; color: #aaa;">Choose one: <b>Load existing dataset</b> OR <b>Scan new directory</b></p>
                 </div>
                 """)
-                
+
                 with gr.Row():
                     with gr.Column(scale=1):
                         gr.HTML("<h4>📂 Load Existing Dataset</h4>")
@@ -58,7 +58,7 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                             label=t("training.load_status"),
                             interactive=False,
                         )
-                    
+
                     with gr.Column(scale=1):
                         gr.HTML("<h4>🔍 Scan New Directory</h4>")
                         with gr.Row():
@@ -73,12 +73,12 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                             label=t("training.scan_status"),
                             interactive=False,
                         )
-                
+
                 gr.HTML("<hr>")
-                
+
                 with gr.Row():
                     with gr.Column(scale=2):
-                        
+
                         # Audio files table
                         audio_files_table = gr.Dataframe(
                             headers=["#", "Filename", "Duration", "Lyrics", "Labeled", "BPM", "Key", "Caption"],
@@ -87,16 +87,16 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                             interactive=False,
                             wrap=True,
                         )
-                    
+
                     with gr.Column(scale=1):
                         gr.HTML(f"<h3>⚙️ {t('training.dataset_settings_header')}</h3>")
-                        
+
                         dataset_name = gr.Textbox(
                             label=t("training.dataset_name"),
                             value="my_lora_dataset",
                             placeholder=t("training.dataset_name_placeholder"),
                         )
-                        
+
                         all_instrumental = gr.Checkbox(
                             label=t("training.all_instrumental"),
                             value=True,
@@ -116,13 +116,13 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                             info="Use LM to transcribe lyrics from audio (coming soon)",
                             interactive=False,  # Disabled for now - model update needed
                         )
-                        
+
                         custom_tag = gr.Textbox(
                             label=t("training.custom_tag"),
                             placeholder="e.g., 8bit_retro, my_style",
                             info=t("training.custom_tag_info"),
                         )
-                        
+
                         tag_position = gr.Radio(
                             choices=[
                                 (t("training.tag_prepend"), "prepend"),
@@ -144,7 +144,7 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                         )
 
                 gr.HTML(f"<hr><h3>🤖 {t('training.step2_title')}</h3>")
-                
+
                 with gr.Row():
                     with gr.Column(scale=3):
                         gr.Markdown("""
@@ -170,15 +170,15 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                             variant="primary",
                             size="lg",
                         )
-                
+
                 label_progress = gr.Textbox(
                     label=t("training.label_progress"),
                     interactive=False,
                     lines=2,
                 )
-                
+
                 gr.HTML(f"<hr><h3>👀 {t('training.step3_title')}</h3>")
-                
+
                 with gr.Row():
                     with gr.Column(scale=1):
                         sample_selector = gr.Slider(
@@ -189,13 +189,13 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                             label=t("training.select_sample"),
                             info=t("training.select_sample_info"),
                         )
-                        
+
                         preview_audio = gr.Audio(
                             label=t("training.audio_preview"),
                             type="filepath",
                             interactive=False,
                         )
-                        
+
                         preview_filename = gr.Textbox(
                             label=t("training.filename"),
                             interactive=False,
@@ -255,7 +255,7 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                                 precision=1,
                                 interactive=False,
                             )
-                        
+
                         with gr.Row():
                             edit_language = gr.Dropdown(
                                 choices=["instrumental", "en", "zh", "ja", "ko", "es", "fr", "de", "pt", "ru", "unknown"],
@@ -267,14 +267,14 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                                 value=True,
                             )
                             save_edit_btn = gr.Button(t("training.save_changes_btn"), variant="secondary")
-                        
+
                         edit_status = gr.Textbox(
                             label=t("training.edit_status"),
                             interactive=False,
                         )
-                
+
                 gr.HTML(f"<hr><h3>💾 {t('training.step4_title')}</h3>")
-                
+
                 with gr.Row():
                     with gr.Column(scale=3):
                         save_path = gr.Textbox(
@@ -289,23 +289,23 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                             variant="primary",
                             size="lg",
                         )
-                
+
                 save_status = gr.Textbox(
                     label=t("training.save_status"),
                     interactive=False,
                     lines=2,
                 )
-                
+
                 gr.HTML(f"<hr><h3>⚡ {t('training.step5_title')}</h3>")
-                
+
                 gr.Markdown("""
                 **Preprocessing converts your dataset to pre-computed tensors for fast training.**
-                
+
                 You can either:
                 - Use the dataset from Steps 1-4 above, **OR**
                 - Load an existing dataset JSON file (if you've already saved one)
                 """)
-                
+
                 with gr.Row():
                     with gr.Column(scale=3):
                         load_existing_dataset_path = gr.Textbox(
@@ -319,22 +319,22 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                             variant="secondary",
                             size="lg",
                         )
-                
+
                 load_existing_status = gr.Textbox(
                     label=t("training.load_status"),
                     interactive=False,
                 )
-                
+
                 gr.Markdown("""
                 This step:
                 - Encodes audio to VAE latents
-                - Encodes captions and lyrics to text embeddings  
+                - Encodes captions and lyrics to text embeddings
                 - Runs the condition encoder
                 - Saves all tensors to `.pt` files
-                
+
                 ⚠️ **This requires the model to be loaded and may take a few minutes.**
                 """)
-                
+
                 with gr.Row():
                     with gr.Column(scale=3):
                         preprocess_output_dir = gr.Textbox(
@@ -349,42 +349,42 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                             variant="primary",
                             size="lg",
                         )
-                
+
                 preprocess_progress = gr.Textbox(
                     label=t("training.preprocess_progress"),
                     interactive=False,
                     lines=3,
                 )
-            
+
             # ==================== Training Tab ====================
             with gr.Tab(t("training.tab_train_lora")):
                 with gr.Row():
                     with gr.Column(scale=2):
                         gr.HTML(f"<h3>📊 {t('training.train_section_tensors')}</h3>")
-                        
+
                         gr.Markdown("""
                         Select the directory containing preprocessed tensor files (`.pt` files).
                         These are created in the "Dataset Builder" tab using the "Preprocess" button.
                         """)
-                        
+
                         training_tensor_dir = gr.Textbox(
                             label=t("training.preprocessed_tensors_dir"),
                             placeholder="./datasets/preprocessed_tensors",
                             value="./datasets/preprocessed_tensors",
                             info=t("training.preprocessed_tensors_info"),
                         )
-                        
+
                         load_dataset_btn = gr.Button(t("training.load_dataset_btn"), variant="secondary")
-                        
+
                         training_dataset_info = gr.Textbox(
                             label=t("training.dataset_info"),
                             interactive=False,
                             lines=3,
                         )
-                    
+
                     with gr.Column(scale=1):
                         gr.HTML(f"<h3>⚙️ {t('training.train_section_lora')}</h3>")
-                        
+
                         lora_rank = gr.Slider(
                             minimum=4,
                             maximum=256,
@@ -393,7 +393,7 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                             label=t("training.lora_rank"),
                             info=t("training.lora_rank_info"),
                         )
-                        
+
                         lora_alpha = gr.Slider(
                             minimum=4,
                             maximum=512,
@@ -402,7 +402,7 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                             label=t("training.lora_alpha"),
                             info=t("training.lora_alpha_info"),
                         )
-                        
+
                         lora_dropout = gr.Slider(
                             minimum=0.0,
                             maximum=0.5,
@@ -410,16 +410,16 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                             value=0.1,
                             label=t("training.lora_dropout"),
                         )
-                
+
                 gr.HTML(f"<hr><h3>🎛️ {t('training.train_section_params')}</h3>")
-                
+
                 with gr.Row():
                     learning_rate = gr.Number(
                         label=t("training.learning_rate"),
                         value=3e-4,
                         info=t("training.learning_rate_info"),
                     )
-                    
+
                     train_epochs = gr.Slider(
                         minimum=100,
                         maximum=4000,
@@ -427,7 +427,7 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                         value=1000,
                         label=t("training.max_epochs"),
                     )
-                    
+
                     train_batch_size = gr.Slider(
                         minimum=1,
                         maximum=8,
@@ -436,7 +436,7 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                         label=t("training.batch_size"),
                         info=t("training.batch_size_info"),
                     )
-                    
+
                     gradient_accumulation = gr.Slider(
                         minimum=1,
                         maximum=16,
@@ -445,7 +445,7 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                         label=t("training.gradient_accumulation"),
                         info=t("training.gradient_accumulation_info"),
                     )
-                
+
                 with gr.Row():
                     save_every_n_epochs = gr.Slider(
                         minimum=50,
@@ -454,7 +454,7 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                         value=200,
                         label=t("training.save_every_n_epochs"),
                     )
-                    
+
                     training_shift = gr.Slider(
                         minimum=1.0,
                         maximum=5.0,
@@ -463,13 +463,13 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                         label=t("training.shift"),
                         info=t("training.shift_info"),
                     )
-                    
+
                     training_seed = gr.Number(
                         label=t("training.seed"),
                         value=42,
                         precision=0,
                     )
-                
+
                 with gr.Row():
                     lora_output_dir = gr.Textbox(
                         label=t("training.output_dir"),
@@ -477,9 +477,9 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                         placeholder="./lora_output",
                         info=t("training.output_dir_info"),
                     )
-                
+
                 gr.HTML("<hr>")
-                
+
                 with gr.Row():
                     with gr.Column(scale=1):
                         start_training_btn = gr.Button(
@@ -493,13 +493,13 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                             variant="stop",
                             size="lg",
                         )
-                
+
                 training_progress = gr.Textbox(
                     label=t("training.training_progress"),
                     interactive=False,
                     lines=2,
                 )
-                
+
                 with gr.Row():
                     training_log = gr.Textbox(
                         label=t("training.training_log"),
@@ -516,9 +516,9 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                         y_title=t("training.loss"),
                         scale=1,
                     )
-                
+
                 gr.HTML(f"<hr><h3>📦 {t('training.export_header')}</h3>")
-                
+
                 with gr.Row():
                     export_path = gr.Textbox(
                         label=t("training.export_path"),
@@ -526,16 +526,16 @@ def create_training_section(dit_handler, llm_handler, init_params=None) -> dict:
                         placeholder="./lora_output/my_lora",
                     )
                     export_lora_btn = gr.Button(t("training.export_lora_btn"), variant="secondary")
-                
+
                 export_status = gr.Textbox(
                     label=t("training.export_status"),
                     interactive=False,
                 )
-    
+
     # Store dataset builder state
     dataset_builder_state = gr.State(None)
     training_state = gr.State({"is_training": False, "should_stop": False})
-    
+
     return {
         # Dataset Builder - Load or Scan
         "load_json_path": load_json_path,

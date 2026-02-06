@@ -480,7 +480,7 @@ def generate_with_progress(
     reference_audio, audio_duration, batch_size_input, src_audio,
     text2music_audio_code_string, repainting_start, repainting_end,
     instruction_display_gen, audio_cover_strength, task_type,
-    use_adg, cfg_interval_start, cfg_interval_end, shift, infer_method, custom_timesteps, audio_format, lm_temperature,
+    use_adg, cfg_interval_start, cfg_interval_end, shift, infer_method, custom_timesteps, audio_format, output_folder, lm_temperature,
     think_checkbox, lm_cfg_scale, lm_top_k, lm_top_p, lm_negative_prompt,
     use_cot_metas, use_cot_caption, use_cot_language, is_format_caption,
     constrained_decoding_debug,
@@ -693,8 +693,10 @@ def generate_with_progress(
             sample_rate = audios[i]["sample_rate"]
             audio_params = audios[i]["params"]
             # Use local output directory instead of system temp
+            # Use custom output folder if provided, otherwise fall back to default
+            results_dir = os.path.abspath(output_folder if output_folder else DEFAULT_RESULTS_DIR).replace("\\", "/")
             timestamp = int(time_module.time())
-            temp_dir = os.path.join(DEFAULT_RESULTS_DIR, f"batch_{timestamp}")
+            temp_dir = os.path.join(results_dir, f"batch_{timestamp}")
             temp_dir = os.path.abspath(temp_dir).replace("\\", "/")
             os.makedirs(temp_dir, exist_ok=True)
             json_path = os.path.join(temp_dir, f"{key}.json").replace("\\", "/")
@@ -1415,7 +1417,7 @@ def capture_current_params(
     reference_audio, audio_duration, batch_size_input, src_audio,
     text2music_audio_code_string, repainting_start, repainting_end,
     instruction_display_gen, audio_cover_strength, task_type,
-    use_adg, cfg_interval_start, cfg_interval_end, shift, infer_method, custom_timesteps, audio_format, lm_temperature,
+    use_adg, cfg_interval_start, cfg_interval_end, shift, infer_method, custom_timesteps, audio_format, output_folder, lm_temperature,
     think_checkbox, lm_cfg_scale, lm_top_k, lm_top_p, lm_negative_prompt,
     use_cot_metas, use_cot_caption, use_cot_language,
     constrained_decoding_debug, allow_lm_batch, auto_score, auto_lrc, score_scale, lm_batch_chunk_size,
@@ -1455,6 +1457,7 @@ def capture_current_params(
         "infer_method": infer_method,
         "custom_timesteps": custom_timesteps,
         "audio_format": audio_format,
+        "output_folder": output_folder,
         "lm_temperature": lm_temperature,
         "think_checkbox": think_checkbox,
         "lm_cfg_scale": lm_cfg_scale,
@@ -1482,7 +1485,7 @@ def generate_with_batch_management(
     reference_audio, audio_duration, batch_size_input, src_audio,
     text2music_audio_code_string, repainting_start, repainting_end,
     instruction_display_gen, audio_cover_strength, task_type,
-    use_adg, cfg_interval_start, cfg_interval_end, shift, infer_method, custom_timesteps, audio_format, lm_temperature,
+    use_adg, cfg_interval_start, cfg_interval_end, shift, infer_method, custom_timesteps, audio_format, output_folder, lm_temperature,
     think_checkbox, lm_cfg_scale, lm_top_k, lm_top_p, lm_negative_prompt,
     use_cot_metas, use_cot_caption, use_cot_language, is_format_caption,
     constrained_decoding_debug,
@@ -1511,7 +1514,7 @@ def generate_with_batch_management(
         reference_audio, audio_duration, batch_size_input, src_audio,
         text2music_audio_code_string, repainting_start, repainting_end,
         instruction_display_gen, audio_cover_strength, task_type,
-        use_adg, cfg_interval_start, cfg_interval_end, shift, infer_method, custom_timesteps, audio_format, lm_temperature,
+        use_adg, cfg_interval_start, cfg_interval_end, shift, infer_method, custom_timesteps, audio_format, output_folder, lm_temperature,
         think_checkbox, lm_cfg_scale, lm_top_k, lm_top_p, lm_negative_prompt,
         use_cot_metas, use_cot_caption, use_cot_language, is_format_caption,
         constrained_decoding_debug,
@@ -1770,6 +1773,7 @@ def generate_next_batch_background(
         params.setdefault("infer_method", "ode")
         params.setdefault("custom_timesteps", "")
         params.setdefault("audio_format", "mp3")
+        params.setdefault("output_folder", "./gradio_outputs")
         params.setdefault("lm_temperature", 0.85)
         params.setdefault("think_checkbox", True)
         params.setdefault("lm_cfg_scale", 2.0)
@@ -1822,6 +1826,7 @@ def generate_next_batch_background(
             infer_method=params.get("infer_method"),
             custom_timesteps=params.get("custom_timesteps"),
             audio_format=params.get("audio_format"),
+            output_folder=params.get("output_folder", "./gradio_outputs"),
             lm_temperature=params.get("lm_temperature"),
             think_checkbox=params.get("think_checkbox"),
             lm_cfg_scale=params.get("lm_cfg_scale"),

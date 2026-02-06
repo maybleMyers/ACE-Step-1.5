@@ -519,11 +519,17 @@ def create_generation_section(dit_handler, llm_handler, init_params=None, langua
                         info=t("generation.random_seed_info")
                     )
                 audio_format = gr.Dropdown(
-                    choices=["mp3", "flac"],
+                    choices=["mp3", "flac", "wav"],
                     value="mp3",
                     label=t("generation.audio_format_label"),
                     info=t("generation.audio_format_info"),
                     interactive=not service_mode  # Fixed in service mode
+                )
+                output_folder = gr.Textbox(
+                    label=t("generation.output_folder_label"),
+                    value="./gradio_outputs",
+                    info=t("generation.output_folder_info"),
+                    interactive=not service_mode
                 )
             
             with gr.Row():
@@ -721,7 +727,26 @@ def create_generation_section(dit_handler, llm_handler, init_params=None, langua
                     value=True,
                     scale=1,
                 )
-    
+
+            # Settings persistence controls
+            with gr.Row():
+                save_settings_btn = gr.Button(
+                    t("generation.save_settings_btn"),
+                    variant="secondary",
+                    size="sm"
+                )
+                load_settings_btn = gr.Button(
+                    t("generation.load_settings_btn"),
+                    variant="secondary",
+                    size="sm"
+                )
+            settings_status = gr.Textbox(
+                label=t("generation.settings_status_label"),
+                interactive=False,
+                visible=False,
+                lines=1
+            )
+
     return {
         "service_config_accordion": service_config_accordion,
         "language_dropdown": language_dropdown,
@@ -803,6 +828,7 @@ def create_generation_section(dit_handler, llm_handler, init_params=None, langua
         "infer_method": infer_method,
         "custom_timesteps": custom_timesteps,
         "audio_format": audio_format,
+        "output_folder": output_folder,
         "think_checkbox": think_checkbox,
         "autogen_checkbox": autogen_checkbox,
         "generate_btn": generate_btn,
@@ -814,6 +840,10 @@ def create_generation_section(dit_handler, llm_handler, init_params=None, langua
         "auto_score": auto_score,
         "auto_lrc": auto_lrc,
         "lm_batch_chunk_size": lm_batch_chunk_size,
+        # Settings persistence
+        "save_settings_btn": save_settings_btn,
+        "load_settings_btn": load_settings_btn,
+        "settings_status": settings_status,
         # GPU config values for validation
         "gpu_config": gpu_config,
         "max_duration": max_duration,

@@ -342,7 +342,57 @@ def setup_event_handlers(demo, dit_handler, llm_handler, dataset_handler, datase
             results_section["status_output"],
         ]
     )
-    
+
+    # ========== Settings Persistence ==========
+    generation_section["save_settings_btn"].click(
+        fn=gen_h.save_user_settings,
+        inputs=[
+            generation_section["output_folder"],
+            generation_section["audio_format"],
+            generation_section["batch_size_input"],
+            generation_section["inference_steps"],
+            generation_section["guidance_scale"],
+            generation_section["seed"],
+            generation_section["bpm"],
+            generation_section["audio_duration"],
+            generation_section["shift"],
+        ],
+        outputs=[generation_section["settings_status"]]
+    )
+
+    generation_section["load_settings_btn"].click(
+        fn=gen_h.load_user_settings,
+        outputs=[
+            generation_section["output_folder"],
+            generation_section["audio_format"],
+            generation_section["batch_size_input"],
+            generation_section["inference_steps"],
+            generation_section["guidance_scale"],
+            generation_section["seed"],
+            generation_section["bpm"],
+            generation_section["audio_duration"],
+            generation_section["shift"],
+            generation_section["settings_status"],
+        ]
+    )
+
+    # Auto-load settings on startup
+    demo.load(
+        fn=gen_h.load_user_settings,
+        outputs=[
+            generation_section["output_folder"],
+            generation_section["audio_format"],
+            generation_section["batch_size_input"],
+            generation_section["inference_steps"],
+            generation_section["guidance_scale"],
+            generation_section["seed"],
+            generation_section["bpm"],
+            generation_section["audio_duration"],
+            generation_section["shift"],
+            generation_section["settings_status"],
+        ]
+    )
+
     # ========== Load/Save Metadata ==========
     generation_section["load_file"].upload(
         fn=lambda file_obj: gen_h.load_metadata(file_obj, llm_handler),
@@ -368,6 +418,7 @@ def setup_event_handlers(demo, dit_handler, llm_handler, dataset_handler, datase
             generation_section["infer_method"],
             generation_section["custom_timesteps"],
             generation_section["audio_format"],
+            generation_section["output_folder"],
             generation_section["lm_temperature"],
             generation_section["lm_cfg_scale"],
             generation_section["lm_top_k"],
@@ -567,6 +618,7 @@ def setup_event_handlers(demo, dit_handler, llm_handler, dataset_handler, datase
             generation_section["infer_method"],
             generation_section["custom_timesteps"],
             generation_section["audio_format"],
+            generation_section["output_folder"],
             generation_section["lm_temperature"],
             generation_section["think_checkbox"],
             generation_section["lm_cfg_scale"],
@@ -755,6 +807,7 @@ def setup_event_handlers(demo, dit_handler, llm_handler, dataset_handler, datase
             generation_section["infer_method"],
             generation_section["custom_timesteps"],
             generation_section["audio_format"],
+            generation_section["output_folder"],
             generation_section["lm_temperature"],
             generation_section["think_checkbox"],
             generation_section["lm_cfg_scale"],

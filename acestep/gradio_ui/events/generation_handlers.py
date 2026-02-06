@@ -1049,3 +1049,72 @@ def handle_format_sample(
         result.status_message,  # status_output
     )
 
+
+def save_user_settings(
+    output_folder,
+    audio_format,
+    batch_size,
+    inference_steps,
+    guidance_scale,
+    seed,
+    bpm,
+    audio_duration,
+    shift
+):
+    """
+    Save user settings to JSON file.
+
+    Args:
+        All the generation parameters to save
+
+    Returns:
+        Status message for the UI
+    """
+    from acestep.gradio_ui.settings_manager import save_settings
+
+    settings = {
+        "output_folder": output_folder,
+        "audio_format": audio_format,
+        "batch_size": batch_size,
+        "inference_steps": inference_steps,
+        "guidance_scale": guidance_scale,
+        "seed": seed,
+        "bpm": bpm,
+        "audio_duration": audio_duration,
+        "shift": shift,
+    }
+
+    status_msg = save_settings(settings)
+    return gr.update(value=status_msg, visible=True)
+
+
+def load_user_settings():
+    """
+    Load user settings from JSON file.
+
+    Returns:
+        Tuple of gr.update() for each component, plus status message
+    """
+    from acestep.gradio_ui.settings_manager import load_settings
+
+    settings = load_settings()
+
+    if not settings:
+        status_msg = "No saved settings found, using defaults"
+    else:
+        status_msg = "✅ Settings loaded successfully"
+
+    # Return gr.update() for each component
+    return (
+        gr.update(value=settings.get("output_folder", "./gradio_outputs")),
+        gr.update(value=settings.get("audio_format", "mp3")),
+        gr.update(value=settings.get("batch_size", 1)),
+        gr.update(value=settings.get("inference_steps", 50)),
+        gr.update(value=settings.get("guidance_scale", 4.5)),
+        gr.update(value=settings.get("seed", "-1")),
+        gr.update(value=settings.get("bpm", 120)),
+        gr.update(value=settings.get("audio_duration", 30)),
+        gr.update(value=settings.get("shift", 3.0)),
+        gr.update(value=status_msg, visible=True),
+    )
+
