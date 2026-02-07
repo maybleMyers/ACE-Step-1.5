@@ -743,7 +743,7 @@ def create_generation_section(dit_handler, llm_handler, init_params=None, langua
             settings_status = gr.Textbox(
                 label=t("generation.settings_status_label"),
                 interactive=False,
-                visible=False,
+                visible=True,
                 lines=1
             )
 

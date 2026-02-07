@@ -1051,7 +1051,8 @@ def handle_format_sample(
 
 
 def save_user_settings(
-    # Model Settings
+    # Model Settings (Service Configuration - most important for initialization)
+    checkpoint,  # Base checkpoint directory
     config_path,
     device,
     init_llm,
@@ -1126,7 +1127,8 @@ def save_user_settings(
     from acestep.gradio_ui.settings_manager import save_settings
 
     settings = {
-        # Model Settings
+        # Model Settings (Service Configuration - most important for initialization)
+        "checkpoint": checkpoint,  # Base checkpoint directory
         "config_path": config_path,
         "device": device,
         "init_llm": init_llm,
@@ -1201,109 +1203,126 @@ def load_user_settings():
     Returns:
         Tuple of gr.update() for each component, plus status message
     """
+    from loguru import logger
     from acestep.gradio_ui.settings_manager import load_settings
 
-    settings = load_settings()
+    # Number of component outputs (must match _settings_components length + 1 for status)
+    NUM_COMPONENT_OUTPUTS = 54
 
-    if not settings:
-        status_msg = "No saved settings found, using defaults"
-    else:
-        status_msg = "Settings loaded successfully"
+    try:
+        settings = load_settings()
 
-    # Slider ranges — clamp loaded values so Gradio doesn't reject them.
-    # inference_steps max changes dynamically (20 turbo / 200 base), so use 200.
-    _slider_ranges = {
-        "inference_steps": (1, 200),
-        "guidance_scale": (1.0, 15.0),
-        "shift": (1.0, 5.0),
-        "cfg_interval_start": (0.0, 1.0),
-        "cfg_interval_end": (0.0, 1.0),
-        "lm_temperature": (0.0, 2.0),
-        "lm_cfg_scale": (1.0, 3.0),
-        "lm_top_k": (0, 100),
-        "lm_top_p": (0.0, 1.0),
-        "lora_scale": (0.0, 1.0),
-        "audio_cover_strength": (0.0, 1.0),
-        "score_scale": (0.01, 1.0),
-    }
+        if not settings:
+            status_msg = "No saved settings found, using defaults"
+        else:
+            status_msg = "Settings loaded successfully"
+            logger.info(f"Loaded {len(settings)} settings from file")
 
-    def g(key, default=None):
-        """Return gr.update with saved value or no-op if key missing."""
-        if key in settings:
-            val = settings[key]
-            if key in _slider_ranges and isinstance(val, (int, float)):
-                lo, hi = _slider_ranges[key]
-                val = max(lo, min(hi, val))
-            return gr.update(value=val)
-        if default is not None:
-            return gr.update(value=default)
-        return gr.update()
+        # Slider ranges — clamp loaded values so Gradio doesn't reject them.
+        # inference_steps max changes dynamically (20 turbo / 200 base), so use 200.
+        _slider_ranges = {
+            "inference_steps": (1, 200),
+            "guidance_scale": (1.0, 15.0),
+            "shift": (1.0, 5.0),
+            "cfg_interval_start": (0.0, 1.0),
+            "cfg_interval_end": (0.0, 1.0),
+            "lm_temperature": (0.0, 2.0),
+            "lm_cfg_scale": (1.0, 3.0),
+            "lm_top_k": (0, 100),
+            "lm_top_p": (0.0, 1.0),
+            "lora_scale": (0.0, 1.0),
+            "audio_cover_strength": (0.0, 1.0),
+            "score_scale": (0.01, 1.0),
+        }
 
-    # Return gr.update() for each component (must match outputs order)
-    return (
-        # Model Settings
-        g("config_path"),
-        g("device"),
-        g("init_llm"),
-        g("lm_model_path"),
-        g("backend"),
-        g("use_flash_attention"),
-        g("offload_to_cpu"),
-        g("offload_dit_to_cpu"),
-        g("compile_model"),
-        g("quantization"),
-        # LoRA
-        g("lora_path"),
-        g("use_lora"),
-        g("lora_scale"),
-        # Task Settings
-        g("task_type"),
-        # Generation - Music Description
-        g("captions"),
-        g("lyrics"),
-        g("vocal_language"),
-        g("instrumental"),
-        # Generation - Optional Parameters
-        g("bpm"),
-        g("key_scale"),
-        g("time_signature"),
-        g("audio_duration"),
-        g("batch_size"),
-        # Advanced
-        g("inference_steps"),
-        g("guidance_scale"),
-        g("seed"),
-        g("audio_format"),
-        g("output_folder"),
-        g("use_adg"),
-        g("shift"),
-        g("infer_method"),
-        g("custom_timesteps"),
-        g("cfg_interval_start"),
-        g("cfg_interval_end"),
-        # LM Parameters
-        g("lm_temperature"),
-        g("lm_cfg_scale"),
-        g("lm_top_k"),
-        g("lm_top_p"),
-        g("lm_negative_prompt"),
-        g("use_cot_metas"),
-        g("use_cot_language"),
-        g("use_cot_caption"),
-        g("constrained_decoding_debug"),
-        g("auto_score"),
-        g("auto_lrc"),
-        g("lm_batch_chunk_size"),
-        # Generation Controls
-        g("think"),
-        g("allow_lm_batch"),
-        g("autogen"),
-        g("audio_cover_strength"),
-        g("score_scale"),
-        # Repainting
-        g("repainting_start"),
-        g("repainting_end"),
-        # Status
-        gr.update(value=status_msg, visible=True),
-    )
+        def g(key, default=None):
+            """Return gr.update with saved value or no-op if key missing."""
+            try:
+                if key in settings:
+                    val = settings[key]
+                    if key in _slider_ranges and isinstance(val, (int, float)):
+                        lo, hi = _slider_ranges[key]
+                        val = max(lo, min(hi, val))
+                    return gr.update(value=val)
+                if default is not None:
+                    return gr.update(value=default)
+                return gr.update()
+            except Exception as e:
+                logger.warning(f"Error loading setting '{key}': {e}")
+                return gr.update()
+
+        # Return gr.update() for each component (must match outputs order)
+        return (
+            # Model Settings (Service Configuration - most important for initialization)
+            g("checkpoint"),  # Base checkpoint directory
+            g("config_path"),
+            g("device"),
+            g("init_llm"),
+            g("lm_model_path"),
+            g("backend"),
+            g("use_flash_attention"),
+            g("offload_to_cpu"),
+            g("offload_dit_to_cpu"),
+            g("compile_model"),
+            g("quantization"),
+            # LoRA
+            g("lora_path"),
+            g("use_lora"),
+            g("lora_scale"),
+            # Task Settings
+            g("task_type"),
+            # Generation - Music Description
+            g("captions"),
+            g("lyrics"),
+            g("vocal_language"),
+            g("instrumental"),
+            # Generation - Optional Parameters
+            g("bpm"),
+            g("key_scale"),
+            g("time_signature"),
+            g("audio_duration"),
+            g("batch_size"),
+            # Advanced
+            g("inference_steps"),
+            g("guidance_scale"),
+            g("seed"),
+            g("audio_format"),
+            g("output_folder"),
+            g("use_adg"),
+            g("shift"),
+            g("infer_method"),
+            g("custom_timesteps"),
+            g("cfg_interval_start"),
+            g("cfg_interval_end"),
+            # LM Parameters
+            g("lm_temperature"),
+            g("lm_cfg_scale"),
+            g("lm_top_k"),
+            g("lm_top_p"),
+            g("lm_negative_prompt"),
+            g("use_cot_metas"),
+            g("use_cot_language"),
+            g("use_cot_caption"),
+            g("constrained_decoding_debug"),
+            g("auto_score"),
+            g("auto_lrc"),
+            g("lm_batch_chunk_size"),
+            # Generation Controls
+            g("think"),
+            g("allow_lm_batch"),
+            g("autogen"),
+            g("audio_cover_strength"),
+            g("score_scale"),
+            # Repainting
+            g("repainting_start"),
+            g("repainting_end"),
+            # Status
+            gr.update(value=status_msg, visible=True),
+        )
+
+    except Exception as e:
+        logger.exception(f"Error loading user settings: {e}")
+        # Return no-op updates for all components + error status
+        error_msg = f"Error loading settings: {str(e)}"
+        return tuple([gr.update()] * NUM_COMPONENT_OUTPUTS + [gr.update(value=error_msg, visible=True)])
 

@@ -346,7 +346,8 @@ def setup_event_handlers(demo, dit_handler, llm_handler, dataset_handler, datase
     # ========== Settings Persistence ==========
     # All saveable components in a consistent order (must match save/load functions)
     _settings_components = [
-        # Model Settings
+        # Model Settings (Service Configuration - most important for initialization)
+        generation_section["checkpoint_dropdown"],  # Base checkpoint directory
         generation_section["config_path"],
         generation_section["device"],
         generation_section["init_llm_checkbox"],
@@ -424,6 +425,7 @@ def setup_event_handlers(demo, dit_handler, llm_handler, dataset_handler, datase
     # Auto-load settings on startup
     demo.load(
         fn=gen_h.load_user_settings,
+        inputs=[],
         outputs=_settings_components + [generation_section["settings_status"]]
     )
 
