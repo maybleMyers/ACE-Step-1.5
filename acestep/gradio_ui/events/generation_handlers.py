@@ -1210,10 +1210,31 @@ def load_user_settings():
     else:
         status_msg = "Settings loaded successfully"
 
+    # Slider ranges — clamp loaded values so Gradio doesn't reject them.
+    # inference_steps max changes dynamically (20 turbo / 200 base), so use 200.
+    _slider_ranges = {
+        "inference_steps": (1, 200),
+        "guidance_scale": (1.0, 15.0),
+        "shift": (1.0, 5.0),
+        "cfg_interval_start": (0.0, 1.0),
+        "cfg_interval_end": (0.0, 1.0),
+        "lm_temperature": (0.0, 2.0),
+        "lm_cfg_scale": (1.0, 3.0),
+        "lm_top_k": (0, 100),
+        "lm_top_p": (0.0, 1.0),
+        "lora_scale": (0.0, 1.0),
+        "audio_cover_strength": (0.0, 1.0),
+        "score_scale": (0.01, 1.0),
+    }
+
     def g(key, default=None):
         """Return gr.update with saved value or no-op if key missing."""
         if key in settings:
-            return gr.update(value=settings[key])
+            val = settings[key]
+            if key in _slider_ranges and isinstance(val, (int, float)):
+                lo, hi = _slider_ranges[key]
+                val = max(lo, min(hi, val))
+            return gr.update(value=val)
         if default is not None:
             return gr.update(value=default)
         return gr.update()
