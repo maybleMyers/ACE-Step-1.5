@@ -1051,15 +1051,68 @@ def handle_format_sample(
 
 
 def save_user_settings(
-    output_folder,
-    audio_format,
+    # Model Settings
+    config_path,
+    device,
+    init_llm,
+    lm_model_path,
+    backend,
+    use_flash_attention,
+    offload_to_cpu,
+    offload_dit_to_cpu,
+    compile_model,
+    quantization,
+    # LoRA
+    lora_path,
+    use_lora,
+    lora_scale,
+    # Task Settings
+    task_type,
+    # Generation - Music Description
+    captions,
+    lyrics,
+    vocal_language,
+    instrumental,
+    # Generation - Optional Parameters
+    bpm,
+    key_scale,
+    time_signature,
+    audio_duration,
     batch_size,
+    # Advanced
     inference_steps,
     guidance_scale,
     seed,
-    bpm,
-    audio_duration,
-    shift
+    audio_format,
+    output_folder,
+    use_adg,
+    shift,
+    infer_method,
+    custom_timesteps,
+    cfg_interval_start,
+    cfg_interval_end,
+    # LM Parameters
+    lm_temperature,
+    lm_cfg_scale,
+    lm_top_k,
+    lm_top_p,
+    lm_negative_prompt,
+    use_cot_metas,
+    use_cot_language,
+    use_cot_caption,
+    constrained_decoding_debug,
+    auto_score,
+    auto_lrc,
+    lm_batch_chunk_size,
+    # Generation Controls
+    think,
+    allow_lm_batch,
+    autogen,
+    audio_cover_strength,
+    score_scale,
+    # Repainting
+    repainting_start,
+    repainting_end,
 ):
     """
     Save user settings to JSON file.
@@ -1073,15 +1126,68 @@ def save_user_settings(
     from acestep.gradio_ui.settings_manager import save_settings
 
     settings = {
-        "output_folder": output_folder,
-        "audio_format": audio_format,
+        # Model Settings
+        "config_path": config_path,
+        "device": device,
+        "init_llm": init_llm,
+        "lm_model_path": lm_model_path,
+        "backend": backend,
+        "use_flash_attention": use_flash_attention,
+        "offload_to_cpu": offload_to_cpu,
+        "offload_dit_to_cpu": offload_dit_to_cpu,
+        "compile_model": compile_model,
+        "quantization": quantization,
+        # LoRA
+        "lora_path": lora_path,
+        "use_lora": use_lora,
+        "lora_scale": lora_scale,
+        # Task Settings
+        "task_type": task_type,
+        # Generation - Music Description
+        "captions": captions,
+        "lyrics": lyrics,
+        "vocal_language": vocal_language,
+        "instrumental": instrumental,
+        # Generation - Optional Parameters
+        "bpm": bpm,
+        "key_scale": key_scale,
+        "time_signature": time_signature,
+        "audio_duration": audio_duration,
         "batch_size": batch_size,
+        # Advanced
         "inference_steps": inference_steps,
         "guidance_scale": guidance_scale,
         "seed": seed,
-        "bpm": bpm,
-        "audio_duration": audio_duration,
+        "audio_format": audio_format,
+        "output_folder": output_folder,
+        "use_adg": use_adg,
         "shift": shift,
+        "infer_method": infer_method,
+        "custom_timesteps": custom_timesteps,
+        "cfg_interval_start": cfg_interval_start,
+        "cfg_interval_end": cfg_interval_end,
+        # LM Parameters
+        "lm_temperature": lm_temperature,
+        "lm_cfg_scale": lm_cfg_scale,
+        "lm_top_k": lm_top_k,
+        "lm_top_p": lm_top_p,
+        "lm_negative_prompt": lm_negative_prompt,
+        "use_cot_metas": use_cot_metas,
+        "use_cot_language": use_cot_language,
+        "use_cot_caption": use_cot_caption,
+        "constrained_decoding_debug": constrained_decoding_debug,
+        "auto_score": auto_score,
+        "auto_lrc": auto_lrc,
+        "lm_batch_chunk_size": lm_batch_chunk_size,
+        # Generation Controls
+        "think": think,
+        "allow_lm_batch": allow_lm_batch,
+        "autogen": autogen,
+        "audio_cover_strength": audio_cover_strength,
+        "score_scale": score_scale,
+        # Repainting
+        "repainting_start": repainting_start,
+        "repainting_end": repainting_end,
     }
 
     status_msg = save_settings(settings)
@@ -1102,19 +1208,81 @@ def load_user_settings():
     if not settings:
         status_msg = "No saved settings found, using defaults"
     else:
-        status_msg = "✅ Settings loaded successfully"
+        status_msg = "Settings loaded successfully"
 
-    # Return gr.update() for each component
+    def g(key, default=None):
+        """Return gr.update with saved value or no-op if key missing."""
+        if key in settings:
+            return gr.update(value=settings[key])
+        if default is not None:
+            return gr.update(value=default)
+        return gr.update()
+
+    # Return gr.update() for each component (must match outputs order)
     return (
-        gr.update(value=settings.get("output_folder", "./gradio_outputs")),
-        gr.update(value=settings.get("audio_format", "mp3")),
-        gr.update(value=settings.get("batch_size", 1)),
-        gr.update(value=settings.get("inference_steps", 50)),
-        gr.update(value=settings.get("guidance_scale", 4.5)),
-        gr.update(value=settings.get("seed", "-1")),
-        gr.update(value=settings.get("bpm", 120)),
-        gr.update(value=settings.get("audio_duration", 30)),
-        gr.update(value=settings.get("shift", 3.0)),
+        # Model Settings
+        g("config_path"),
+        g("device"),
+        g("init_llm"),
+        g("lm_model_path"),
+        g("backend"),
+        g("use_flash_attention"),
+        g("offload_to_cpu"),
+        g("offload_dit_to_cpu"),
+        g("compile_model"),
+        g("quantization"),
+        # LoRA
+        g("lora_path"),
+        g("use_lora"),
+        g("lora_scale"),
+        # Task Settings
+        g("task_type"),
+        # Generation - Music Description
+        g("captions"),
+        g("lyrics"),
+        g("vocal_language"),
+        g("instrumental"),
+        # Generation - Optional Parameters
+        g("bpm"),
+        g("key_scale"),
+        g("time_signature"),
+        g("audio_duration"),
+        g("batch_size"),
+        # Advanced
+        g("inference_steps"),
+        g("guidance_scale"),
+        g("seed"),
+        g("audio_format"),
+        g("output_folder"),
+        g("use_adg"),
+        g("shift"),
+        g("infer_method"),
+        g("custom_timesteps"),
+        g("cfg_interval_start"),
+        g("cfg_interval_end"),
+        # LM Parameters
+        g("lm_temperature"),
+        g("lm_cfg_scale"),
+        g("lm_top_k"),
+        g("lm_top_p"),
+        g("lm_negative_prompt"),
+        g("use_cot_metas"),
+        g("use_cot_language"),
+        g("use_cot_caption"),
+        g("constrained_decoding_debug"),
+        g("auto_score"),
+        g("auto_lrc"),
+        g("lm_batch_chunk_size"),
+        # Generation Controls
+        g("think"),
+        g("allow_lm_batch"),
+        g("autogen"),
+        g("audio_cover_strength"),
+        g("score_scale"),
+        # Repainting
+        g("repainting_start"),
+        g("repainting_end"),
+        # Status
         gr.update(value=status_msg, visible=True),
     )
 

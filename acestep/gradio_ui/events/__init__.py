@@ -344,53 +344,87 @@ def setup_event_handlers(demo, dit_handler, llm_handler, dataset_handler, datase
     )
 
     # ========== Settings Persistence ==========
+    # All saveable components in a consistent order (must match save/load functions)
+    _settings_components = [
+        # Model Settings
+        generation_section["config_path"],
+        generation_section["device"],
+        generation_section["init_llm_checkbox"],
+        generation_section["lm_model_path"],
+        generation_section["backend_dropdown"],
+        generation_section["use_flash_attention_checkbox"],
+        generation_section["offload_to_cpu_checkbox"],
+        generation_section["offload_dit_to_cpu_checkbox"],
+        generation_section["compile_model_checkbox"],
+        generation_section["quantization_checkbox"],
+        # LoRA
+        generation_section["lora_path"],
+        generation_section["use_lora_checkbox"],
+        generation_section["lora_scale_slider"],
+        # Task Settings
+        generation_section["task_type"],
+        # Generation - Music Description
+        generation_section["captions"],
+        generation_section["lyrics"],
+        generation_section["vocal_language"],
+        generation_section["instrumental_checkbox"],
+        # Generation - Optional Parameters
+        generation_section["bpm"],
+        generation_section["key_scale"],
+        generation_section["time_signature"],
+        generation_section["audio_duration"],
+        generation_section["batch_size_input"],
+        # Advanced
+        generation_section["inference_steps"],
+        generation_section["guidance_scale"],
+        generation_section["seed"],
+        generation_section["audio_format"],
+        generation_section["output_folder"],
+        generation_section["use_adg"],
+        generation_section["shift"],
+        generation_section["infer_method"],
+        generation_section["custom_timesteps"],
+        generation_section["cfg_interval_start"],
+        generation_section["cfg_interval_end"],
+        # LM Parameters
+        generation_section["lm_temperature"],
+        generation_section["lm_cfg_scale"],
+        generation_section["lm_top_k"],
+        generation_section["lm_top_p"],
+        generation_section["lm_negative_prompt"],
+        generation_section["use_cot_metas"],
+        generation_section["use_cot_language"],
+        generation_section["use_cot_caption"],
+        generation_section["constrained_decoding_debug"],
+        generation_section["auto_score"],
+        generation_section["auto_lrc"],
+        generation_section["lm_batch_chunk_size"],
+        # Generation Controls
+        generation_section["think_checkbox"],
+        generation_section["allow_lm_batch"],
+        generation_section["autogen_checkbox"],
+        generation_section["audio_cover_strength"],
+        generation_section["score_scale"],
+        # Repainting
+        generation_section["repainting_start"],
+        generation_section["repainting_end"],
+    ]
+
     generation_section["save_settings_btn"].click(
         fn=gen_h.save_user_settings,
-        inputs=[
-            generation_section["output_folder"],
-            generation_section["audio_format"],
-            generation_section["batch_size_input"],
-            generation_section["inference_steps"],
-            generation_section["guidance_scale"],
-            generation_section["seed"],
-            generation_section["bpm"],
-            generation_section["audio_duration"],
-            generation_section["shift"],
-        ],
+        inputs=_settings_components,
         outputs=[generation_section["settings_status"]]
     )
 
     generation_section["load_settings_btn"].click(
         fn=gen_h.load_user_settings,
-        outputs=[
-            generation_section["output_folder"],
-            generation_section["audio_format"],
-            generation_section["batch_size_input"],
-            generation_section["inference_steps"],
-            generation_section["guidance_scale"],
-            generation_section["seed"],
-            generation_section["bpm"],
-            generation_section["audio_duration"],
-            generation_section["shift"],
-            generation_section["settings_status"],
-        ]
+        outputs=_settings_components + [generation_section["settings_status"]]
     )
 
     # Auto-load settings on startup
     demo.load(
         fn=gen_h.load_user_settings,
-        outputs=[
-            generation_section["output_folder"],
-            generation_section["audio_format"],
-            generation_section["batch_size_input"],
-            generation_section["inference_steps"],
-            generation_section["guidance_scale"],
-            generation_section["seed"],
-            generation_section["bpm"],
-            generation_section["audio_duration"],
-            generation_section["shift"],
-            generation_section["settings_status"],
-        ]
+        outputs=_settings_components + [generation_section["settings_status"]]
     )
 
     # ========== Load/Save Metadata ==========
