@@ -595,11 +595,13 @@ def update_instruction_ui(
         audio_cover_strength_info = t("generation.cover_strength_info")
     # Show repainting controls for repaint and lego
     repainting_visible = task_type_value in ["repaint", "lego"]
+    # Show img2img controls for img2img task
+    img2img_visible = task_type_value == "img2img"
     # Show text2music_audio_codes if task is text2music OR if it has content
     # This allows it to stay visible even if user switches task type but has codes
     has_audio_codes = audio_codes_content and str(audio_codes_content).strip()
     text2music_audio_codes_visible = task_type_value == "text2music" or has_audio_codes
-    
+
     return (
         instruction,  # instruction_display_gen
         gr.update(visible=track_name_visible),  # track_name
@@ -607,6 +609,7 @@ def update_instruction_ui(
         gr.update(visible=audio_cover_strength_visible, label=audio_cover_strength_label, info=audio_cover_strength_info),  # audio_cover_strength
         gr.update(visible=repainting_visible),  # repainting_group
         gr.update(visible=text2music_audio_codes_visible),  # text2music_audio_codes_group
+        gr.update(visible=img2img_visible),  # img2img_group
     )
 
 
@@ -1114,6 +1117,9 @@ def save_user_settings(
     # Repainting
     repainting_start,
     repainting_end,
+    # Img2Img
+    img2img_strength,
+    img2img_use_conditioning,
 ):
     """
     Save user settings to JSON file.
@@ -1190,6 +1196,9 @@ def save_user_settings(
         # Repainting
         "repainting_start": repainting_start,
         "repainting_end": repainting_end,
+        # Img2Img
+        "img2img_strength": img2img_strength,
+        "img2img_use_conditioning": img2img_use_conditioning,
     }
 
     status_msg = save_settings(settings)
@@ -1207,7 +1216,7 @@ def load_user_settings():
     from acestep.gradio_ui.settings_manager import load_settings
 
     # Number of component outputs (must match _settings_components length + 1 for status)
-    NUM_COMPONENT_OUTPUTS = 54
+    NUM_COMPONENT_OUTPUTS = 56
 
     try:
         settings = load_settings()
@@ -1233,6 +1242,7 @@ def load_user_settings():
             "lora_scale": (0.0, 1.0),
             "audio_cover_strength": (0.0, 1.0),
             "score_scale": (0.01, 1.0),
+            "img2img_strength": (0.0, 1.0),
         }
 
         def g(key, default=None):
@@ -1316,6 +1326,9 @@ def load_user_settings():
             # Repainting
             g("repainting_start"),
             g("repainting_end"),
+            # Img2Img
+            g("img2img_strength"),
+            g("img2img_use_conditioning"),
             # Status
             gr.update(value=status_msg, visible=True),
         )

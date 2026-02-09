@@ -489,6 +489,8 @@ def generate_with_progress(
     auto_lrc,
     score_scale,
     lm_batch_chunk_size,
+    img2img_strength,
+    img2img_use_conditioning,
     progress=gr.Progress(track_tqdm=True),
 ):
     """Generate audio with progress tracking"""
@@ -561,6 +563,8 @@ def generate_with_progress(
         repainting_start=repainting_start,
         repainting_end=repainting_end,
         audio_cover_strength=audio_cover_strength,
+        img2img_strength=img2img_strength,
+        img2img_use_conditioning=img2img_use_conditioning,
         thinking=think_checkbox,
         lm_temperature=lm_temperature,
         lm_cfg_scale=lm_cfg_scale,
@@ -1494,6 +1498,8 @@ def generate_with_batch_management(
     auto_lrc,
     score_scale,
     lm_batch_chunk_size,
+    img2img_strength,
+    img2img_use_conditioning,
     track_name,
     complete_track_classes,
     autogen_checkbox,
@@ -1523,6 +1529,8 @@ def generate_with_batch_management(
         auto_lrc,
         score_scale,
         lm_batch_chunk_size,
+        img2img_strength,
+        img2img_use_conditioning,
         progress
     )
     final_result_from_inner = None

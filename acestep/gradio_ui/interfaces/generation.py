@@ -329,7 +329,27 @@ def create_generation_section(dit_handler, llm_handler, init_params=None, langua
                                 minimum=-1,
                                 step=0.1,
                             )
-                    
+
+                    # Img2Img controls
+                    with gr.Group(visible=False) as img2img_group:
+                        gr.HTML(f"<h5>{t('generation.img2img_controls')}</h5>")
+                        with gr.Row():
+                            img2img_strength = gr.Slider(
+                                label=t("generation.img2img_strength"),
+                                minimum=0.0,
+                                maximum=1.0,
+                                value=0.7,
+                                step=0.01,
+                                info=t("generation.img2img_strength_info"),
+                                scale=3,
+                            )
+                            img2img_use_conditioning = gr.Checkbox(
+                                label=t("generation.img2img_use_conditioning"),
+                                value=True,
+                                info=t("generation.img2img_use_conditioning_info"),
+                                scale=1,
+                            )
+
                     # Simple/Custom Mode Toggle
                     # In service mode: only Custom mode, hide the toggle
                     with gr.Row(visible=not service_mode):
@@ -794,6 +814,10 @@ def create_generation_section(dit_handler, llm_handler, init_params=None, langua
         "repainting_start": repainting_start,
         "repainting_end": repainting_end,
         "audio_cover_strength": audio_cover_strength,
+        # Img2Img controls
+        "img2img_group": img2img_group,
+        "img2img_strength": img2img_strength,
+        "img2img_use_conditioning": img2img_use_conditioning,
         # Simple/Custom Mode Components
         "generation_mode": generation_mode,
         "simple_mode_group": simple_mode_group,

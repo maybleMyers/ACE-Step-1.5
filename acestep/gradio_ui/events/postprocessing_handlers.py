@@ -12,6 +12,8 @@ from acestep.gradio_ui.postprocessing_utils import (
     apply_fade_in,
     apply_fade_out,
     change_speed,
+    audiosr_super_resolution,
+    unload_audiosr_model,
 )
 
 
@@ -138,6 +140,38 @@ def setup_postprocessing_event_handlers(demo, postprocessing_section):
         ],
         outputs=[
             postprocessing_section["pp_output_audio"],
+            postprocessing_section["pp_output_status"],
+        ]
+    )
+
+    # AudioSR Super-Resolution
+    postprocessing_section["pp_audiosr_btn"].click(
+        fn=audiosr_super_resolution,
+        inputs=[
+            postprocessing_section["pp_audio_input"],
+            postprocessing_section["pp_audiosr_model"],
+            postprocessing_section["pp_audiosr_ddim_steps"],
+            postprocessing_section["pp_audiosr_guidance_scale"],
+            postprocessing_section["pp_audiosr_seed"],
+            postprocessing_section["pp_audiosr_device"],
+            postprocessing_section["pp_audiosr_prefilter"],
+            postprocessing_section["pp_audiosr_prefilter_cutoff"],
+            postprocessing_section["pp_audiosr_chunk_duration"],
+            postprocessing_section["pp_audiosr_overlap_duration"],
+            postprocessing_section["pp_audiosr_normalize"],
+            postprocessing_section["pp_audiosr_output_format"],
+        ],
+        outputs=[
+            postprocessing_section["pp_output_audio"],
+            postprocessing_section["pp_output_status"],
+        ]
+    )
+
+    # Unload AudioSR model
+    postprocessing_section["pp_audiosr_unload_btn"].click(
+        fn=unload_audiosr_model,
+        inputs=[],
+        outputs=[
             postprocessing_section["pp_output_status"],
         ]
     )

@@ -139,6 +139,115 @@ def create_postprocessing_section():
                 )
                 pp_speed_btn = gr.Button(t("postprocessing.speed_btn"))
 
+            # AudioSR Super-Resolution
+            with gr.Accordion(t("postprocessing.audiosr_title"), open=False):
+                gr.Markdown(t("postprocessing.audiosr_description"))
+
+                # Model selection
+                pp_audiosr_model = gr.Dropdown(
+                    label=t("postprocessing.audiosr_model_label"),
+                    choices=["basic", "speech"],
+                    value="basic",
+                    info=t("postprocessing.audiosr_model_info")
+                )
+
+                # Quality settings
+                gr.Markdown(f"**{t('postprocessing.audiosr_quality_title')}**")
+                with gr.Row():
+                    pp_audiosr_ddim_steps = gr.Slider(
+                        label=t("postprocessing.audiosr_ddim_steps_label"),
+                        minimum=10,
+                        maximum=100,
+                        value=50,
+                        step=5,
+                        info=t("postprocessing.audiosr_ddim_steps_info")
+                    )
+                    pp_audiosr_guidance_scale = gr.Slider(
+                        label=t("postprocessing.audiosr_guidance_scale_label"),
+                        minimum=1.0,
+                        maximum=10.0,
+                        value=3.5,
+                        step=0.1,
+                        info=t("postprocessing.audiosr_guidance_scale_info")
+                    )
+
+                with gr.Row():
+                    pp_audiosr_seed = gr.Number(
+                        label=t("postprocessing.audiosr_seed_label"),
+                        value=-1,
+                        precision=0,
+                        info=t("postprocessing.audiosr_seed_info")
+                    )
+                    pp_audiosr_device = gr.Dropdown(
+                        label=t("postprocessing.audiosr_device_label"),
+                        choices=["auto", "cuda", "cpu"],
+                        value="auto",
+                        info=t("postprocessing.audiosr_device_info")
+                    )
+
+                # Preprocessing
+                gr.Markdown(f"**{t('postprocessing.audiosr_preprocess_title')}**")
+                with gr.Row():
+                    pp_audiosr_prefilter = gr.Checkbox(
+                        label=t("postprocessing.audiosr_prefilter_label"),
+                        value=True,
+                        info=t("postprocessing.audiosr_prefilter_info")
+                    )
+                    pp_audiosr_prefilter_cutoff = gr.Slider(
+                        label=t("postprocessing.audiosr_prefilter_cutoff_label"),
+                        minimum=4000,
+                        maximum=20000,
+                        value=12000,
+                        step=500,
+                        info=t("postprocessing.audiosr_prefilter_cutoff_info")
+                    )
+
+                # Long audio processing
+                gr.Markdown(f"**{t('postprocessing.audiosr_chunking_title')}**")
+                with gr.Row():
+                    pp_audiosr_chunk_duration = gr.Slider(
+                        label=t("postprocessing.audiosr_chunk_duration_label"),
+                        minimum=2.56,
+                        maximum=10.24,
+                        value=10.24,
+                        step=0.01,
+                        info=t("postprocessing.audiosr_chunk_duration_info")
+                    )
+                    pp_audiosr_overlap_duration = gr.Slider(
+                        label=t("postprocessing.audiosr_overlap_duration_label"),
+                        minimum=0.5,
+                        maximum=3.0,
+                        value=1.0,
+                        step=0.1,
+                        info=t("postprocessing.audiosr_overlap_duration_info")
+                    )
+
+                # Output settings
+                gr.Markdown(f"**{t('postprocessing.audiosr_output_title')}**")
+                with gr.Row():
+                    pp_audiosr_normalize = gr.Checkbox(
+                        label=t("postprocessing.audiosr_normalize_label"),
+                        value=True,
+                        info=t("postprocessing.audiosr_normalize_info")
+                    )
+                    pp_audiosr_output_format = gr.Dropdown(
+                        label=t("postprocessing.audiosr_output_format_label"),
+                        choices=["wav", "mp3", "flac"],
+                        value="wav",
+                        info=t("postprocessing.audiosr_output_format_info")
+                    )
+
+                # Action buttons
+                with gr.Row():
+                    pp_audiosr_btn = gr.Button(
+                        t("postprocessing.audiosr_btn"),
+                        variant="primary"
+                    )
+                    pp_audiosr_unload_btn = gr.Button(
+                        t("postprocessing.audiosr_unload_btn"),
+                        variant="secondary"
+                    )
+
         # Right column: Output
         with gr.Column(scale=1):
             with gr.Accordion(t("postprocessing.output_title"), open=True):
@@ -179,4 +288,18 @@ def create_postprocessing_section():
         "pp_speed_btn": pp_speed_btn,
         "pp_output_audio": pp_output_audio,
         "pp_output_status": pp_output_status,
+        # AudioSR components
+        "pp_audiosr_model": pp_audiosr_model,
+        "pp_audiosr_ddim_steps": pp_audiosr_ddim_steps,
+        "pp_audiosr_guidance_scale": pp_audiosr_guidance_scale,
+        "pp_audiosr_seed": pp_audiosr_seed,
+        "pp_audiosr_device": pp_audiosr_device,
+        "pp_audiosr_prefilter": pp_audiosr_prefilter,
+        "pp_audiosr_prefilter_cutoff": pp_audiosr_prefilter_cutoff,
+        "pp_audiosr_chunk_duration": pp_audiosr_chunk_duration,
+        "pp_audiosr_overlap_duration": pp_audiosr_overlap_duration,
+        "pp_audiosr_normalize": pp_audiosr_normalize,
+        "pp_audiosr_output_format": pp_audiosr_output_format,
+        "pp_audiosr_btn": pp_audiosr_btn,
+        "pp_audiosr_unload_btn": pp_audiosr_unload_btn,
     }

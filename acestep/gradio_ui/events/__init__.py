@@ -171,6 +171,7 @@ def setup_event_handlers(demo, dit_handler, llm_handler, dataset_handler, datase
                 generation_section["audio_cover_strength"],
                 generation_section["repainting_group"],
                 generation_section["text2music_audio_codes_group"],
+                generation_section["img2img_group"],
             ]
         )
     
@@ -409,6 +410,9 @@ def setup_event_handlers(demo, dit_handler, llm_handler, dataset_handler, datase
         # Repainting
         generation_section["repainting_start"],
         generation_section["repainting_end"],
+        # Img2Img
+        generation_section["img2img_strength"],
+        generation_section["img2img_use_conditioning"],
     ]
 
     generation_section["save_settings_btn"].click(
@@ -671,6 +675,8 @@ def setup_event_handlers(demo, dit_handler, llm_handler, dataset_handler, datase
             generation_section["auto_lrc"],
             generation_section["score_scale"],
             generation_section["lm_batch_chunk_size"],
+            generation_section["img2img_strength"],
+            generation_section["img2img_use_conditioning"],
             generation_section["track_name"],
             generation_section["complete_track_classes"],
             generation_section["autogen_checkbox"],

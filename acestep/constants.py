@@ -53,13 +53,13 @@ VALID_TIME_SIGNATURES = [2, 3, 4, 6]
 # Task Type Constants
 # ==============================================================================
 
-TASK_TYPES = ["text2music", "repaint", "cover", "extract", "lego", "complete"]
+TASK_TYPES = ["text2music", "repaint", "cover", "extract", "lego", "complete", "img2img"]
 
 # Task types available for turbo models (subset)
-TASK_TYPES_TURBO = ["text2music", "repaint", "cover"]
+TASK_TYPES_TURBO = ["text2music", "repaint", "cover", "img2img"]
 
 # Task types available for base models (full set)
-TASK_TYPES_BASE = ["text2music", "repaint", "cover", "extract", "lego", "complete"]
+TASK_TYPES_BASE = ["text2music", "repaint", "cover", "extract", "lego", "complete", "img2img"]
 
 
 # ==============================================================================
@@ -86,6 +86,7 @@ TASK_INSTRUCTIONS = {
     "lego_default": "Generate the track based on the audio context:",
     "complete": "Complete the input track with {TRACK_CLASSES}:",
     "complete_default": "Complete the input track:",
+    "img2img": "Transform the input audio based on the given conditions:",
 }
 
 

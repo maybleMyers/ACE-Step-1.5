@@ -42,7 +42,18 @@ dependencies = [
     # Local third-party packages
     # nano-vllm is a local package - install separately: pip install -e acestep/third_parts/nano-vllm
     # For uv users: automatically handled via [tool.uv.sources]
-    "modelscope"
+    "modelscope",
+    # Audio processing (for postprocessing and AudioSR)
+    "librosa>=0.10.0",
+    "pydub>=0.25.1",
+    "progressbar",
+    "unidecode",
+    "phonemizer",
+    "torchlibrosa>=0.0.9",
+    "chardet",
+    "ftfy",
+    "timm",
+    "pandas"
 ]
 
 [[tool.uv.index]]
